@@ -4,6 +4,10 @@ RSpec.describe 'invoices show' do
   before :each do
     @merchant1 = Merchant.create!(name: 'Hair Care')
     @merchant2 = Merchant.create!(name: 'Jewelry')
+    
+    @bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
+    @bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
+    @bd3 = @merchant1.bulk_discounts.create!(threshold: 20, discount: 20)
 
     @item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: @merchant1.id, status: 1)
     @item_2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: @merchant1.id)
@@ -32,8 +36,8 @@ RSpec.describe 'invoices show' do
 
     @invoice_8 = Invoice.create!(customer_id: @customer_6.id, status: 1)
 
-    @ii_1 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_1.id, quantity: 9, unit_price: 10, status: 2)
-    @ii_2 = InvoiceItem.create!(invoice_id: @invoice_2.id, item_id: @item_1.id, quantity: 1, unit_price: 10, status: 2)
+    @ii_1 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_1.id, quantity: 10, unit_price: 10, status: 2)
+    @ii_2 = InvoiceItem.create!(invoice_id: @invoice_2.id, item_id: @item_1.id, quantity: 16, unit_price: 10, status: 2)
     @ii_3 = InvoiceItem.create!(invoice_id: @invoice_3.id, item_id: @item_2.id, quantity: 2, unit_price: 8, status: 2)
     @ii_4 = InvoiceItem.create!(invoice_id: @invoice_4.id, item_id: @item_3.id, quantity: 3, unit_price: 5, status: 1)
     @ii_6 = InvoiceItem.create!(invoice_id: @invoice_5.id, item_id: @item_4.id, quantity: 1, unit_price: 1, status: 1)
@@ -51,6 +55,7 @@ RSpec.describe 'invoices show' do
     @transaction6 = Transaction.create!(credit_card_number: 879799, result: 0, invoice_id: @invoice_6.id)
     @transaction7 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_7.id)
     @transaction8 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_8.id)
+
   end
 
   it "shows the invoice information" do
@@ -101,13 +106,19 @@ RSpec.describe 'invoices show' do
   end
 
   it 'shows the total revenue of the merchant from this invoice' do
-    visit "/merchants/#{@merchant1.id}/invoices"
+    visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
     expect(page).to have_content("Total Revenue from Invoice ##{@invoice_1.id}")
   end
 
-  it 'includes the bulk discounts in the calculation' do
-    visit "/merchants/#{@merchant1.id}/invoices"
-    expect(page).to have_content("Total Revenue: $90")
+  it 'it displays the revenue for the merchant from this invoice, NOT including discounts' do
+    visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
+    expect(page).to have_content("Total Revenue: $172.0")
+  end
+
+  it 'it displays the total discounted revenue for the merchant which has the bulk discounts in the calculation' do
+    visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
+    save_and_open_page
+    expect(page).to have_content("Total Discount: $17.2")
   end
 
 
