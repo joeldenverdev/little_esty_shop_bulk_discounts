@@ -4,7 +4,7 @@ RSpec.describe 'invoices show' do
   before :each do
     @merchant1 = Merchant.create!(name: 'Hair Care')
     @merchant2 = Merchant.create!(name: 'Jewelry')
-    
+
     @bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
     @bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
     @bd3 = @merchant1.bulk_discounts.create!(threshold: 20, discount: 20)
@@ -117,8 +117,12 @@ RSpec.describe 'invoices show' do
 
   it 'it displays the total discounted revenue for the merchant which has the bulk discounts in the calculation' do
     visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
-    save_and_open_page
     expect(page).to have_content("Total Discount: $17.2")
+  end
+
+  it 'has a link next to each invoice item to the show page for that bulk discount, if there was one' do
+    visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
+    expect(page).to have_link("Bulk Discount Applied")
   end
 
 
