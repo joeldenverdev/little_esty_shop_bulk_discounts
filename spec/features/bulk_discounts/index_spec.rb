@@ -56,9 +56,9 @@ RSpec.describe 'merchants bulk discount index page' do
   end
 
   it 'has a list of all of the merchants bulk discounts including threshold and percentage' do
-    expect(page).to have_content("Threshold: 10, Discount: 10.0%")
-    expect(page).to have_content("Threshold: 15, Discount: 15.0%")
-    expect(page).to have_content("Threshold: 20, Discount: 20.0%")
+    expect(page).to have_content("Threshold: 10, Discount: 10%")
+    expect(page).to have_content("Threshold: 15, Discount: 15%")
+    expect(page).to have_content("Threshold: 20, Discount: 20%")
   end
 
   it 'has a link to go to the bulk discounts view page' do

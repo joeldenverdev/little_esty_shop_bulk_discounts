@@ -10,6 +10,18 @@ class Invoice < ApplicationRecord
 
   enum status: [:cancelled, 'in progress', :complete]
 
+  def percent_discount
+    invoice_items.where('discount != ?', 0).pluck(:discount)
+  end
+
+  def total_after_discount
+    invoice_items.sum("discounted_price * quantity")
+  end
+
+  def total_discount
+    invoice_items.sum("(unit_price * quantity) - (discounted_price * quantity)")
+  end
+
   def total_revenue
     invoice_items.sum("unit_price * quantity")
   end
