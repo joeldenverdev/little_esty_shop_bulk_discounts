@@ -32,6 +32,96 @@ RSpec.describe InvoiceItem, type: :model do
     end
   end
 
+  describe '#eligible_discount' do
+    it 'returns 0 when there is no eligible discount' do
+      @merchant1 = Merchant.create!(name: 'Hair Care')
+      @bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
+      @bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
+      @item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: @merchant1.id, status: 1)
+      @item_2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: @merchant1.id)
+      @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+      @invoice_1 = Invoice.create!(customer_id: @customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+      @ii_1 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_1.id, quantity: 1, unit_price: 10, status: 2)
+      @transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_1.id)
+
+      expect(@ii_1.eligible_discount).to eq(0)
+    end
+
+    it 'returns the highest eligible discount, but not the highest one for that merchant' do
+      @merchant1 = Merchant.create!(name: 'Hair Care')
+      @bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
+      @bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
+      @item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: @merchant1.id, status: 1)
+      @item_2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: @merchant1.id)
+      @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+      @invoice_1 = Invoice.create!(customer_id: @customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+      @ii_1 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_1.id, quantity: 11, unit_price: 10, status: 2)
+      @transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_1.id)
+
+      expect(@ii_1.eligible_discount).to eq(10)
+    end
+
+    it 'returns the highest eligible discount when the customer qualifies for more than one' do
+      @merchant1 = Merchant.create!(name: 'Hair Care')
+      @bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
+      @bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
+      @item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: @merchant1.id, status: 1)
+      @item_2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: @merchant1.id)
+      @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+      @invoice_1 = Invoice.create!(customer_id: @customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+      @ii_1 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_1.id, quantity: 16, unit_price: 10, status: 2)
+      @transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_1.id)
+
+      expect(@ii_1.eligible_discount).to eq(15)
+    end
+  end
+
+  describe '#has_discount' do
+    it 'returns true if the invoice_item has a discount applied to it' do
+      @merchant1 = Merchant.create!(name: 'Hair Care')
+      @bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
+      @bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
+      @item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: @merchant1.id, status: 1)
+      @item_2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: @merchant1.id)
+      @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+      @invoice_1 = Invoice.create!(customer_id: @customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+      @ii_1 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_1.id, quantity: 16, unit_price: 10, status: 2)
+      @transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_1.id)
+
+      expect(@ii_1.has_discount).to be(true)
+    end
+
+    it 'returns false if the invoice_item does not have a discount applied to it' do
+      @merchant1 = Merchant.create!(name: 'Hair Care')
+      @bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
+      @bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
+      @item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: @merchant1.id, status: 1)
+      @item_2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: @merchant1.id)
+      @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+      @invoice_1 = Invoice.create!(customer_id: @customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+      @ii_1 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_1.id, quantity: 9, unit_price: 10, status: 2)
+      @transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_1.id)
+
+      expect(@ii_1.has_discount).to be(false)
+    end
+  end
+
+  describe '#bd_id' do
+    it 'returns the ID of the Bulk Discount that is applied to this invoice item' do
+      @merchant1 = Merchant.create!(name: 'Hair Care')
+      @bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
+      @bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
+      @item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: @merchant1.id, status: 1)
+      @item_2 = Item.create!(name: "Conditioner", description: "This makes your hair shiny", unit_price: 8, merchant_id: @merchant1.id)
+      @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+      @invoice_1 = Invoice.create!(customer_id: @customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+      @ii_1 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_1.id, quantity: 10, unit_price: 10, status: 2)
+      @transaction1 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_1.id)
+
+      expect(@ii_1.bd_id).to eq(@bd1.id)
+    end
+  end
+
   describe "class methods" do
     before(:each) do
       @m1 = Merchant.create!(name: 'Merchant 1')
@@ -54,6 +144,7 @@ RSpec.describe InvoiceItem, type: :model do
       @ii_3 = InvoiceItem.create!(invoice_id: @i2.id, item_id: @item_3.id, quantity: 1, unit_price: 5, status: 2)
       @ii_4 = InvoiceItem.create!(invoice_id: @i3.id, item_id: @item_3.id, quantity: 1, unit_price: 5, status: 1)
     end
+    
     it 'incomplete_invoices' do
       expect(InvoiceItem.incomplete_invoices).to eq([@i1, @i3])
     end
