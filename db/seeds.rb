@@ -17,6 +17,27 @@ Merchant.destroy_all
 @merchant9 = Merchant.create!(name: 'Tree Co')
 @merchant10 = Merchant.create!(name: 'Food Co')
 
+
+@bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
+@bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
+@bd3 = @merchant1.bulk_discounts.create!(threshold: 20, discount: 20)
+
+@bd4 = @merchant2.bulk_discounts.create!(threshold: 5, discount: 5)
+
+@bd5 = @merchant3.bulk_discounts.create!(threshold: 10, discount: 11)
+
+@bd6 = @merchant4.bulk_discounts.create!(threshold: 20, discount: 20)
+@bd7 = @merchant4.bulk_discounts.create!(threshold: 20, discount: 20)
+
+@bd8 = @merchant5.bulk_discounts.create!(threshold: 10, discount: 10)
+@bd9 = @merchant5.bulk_discounts.create!(threshold: 15, discount: 15)
+
+@bd10 = @merchant6.bulk_discounts.create!(threshold: 20, discount: 20)
+@bd11 = @merchant6.bulk_discounts.create!(threshold: 20, discount: 20)
+
+@bd12 = @merchant7.bulk_discounts.create!(threshold: 20, discount: 20)
+
+
 @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
 @customer_2 = Customer.create!(first_name: 'Cecilia', last_name: 'Jones')
 @customer_3 = Customer.create!(first_name: 'Mariah', last_name: 'Carrey')
@@ -133,22 +154,3 @@ Merchant.destroy_all
 @transaction6 = Transaction.create!(credit_card_number: 879799, result: 1, invoice_id: @invoice_7.id)
 @transaction7 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_2.id)
 @transaction8 = Transaction.create!(credit_card_number: 123456, result: 1, invoice_id: @invoice_8.id)
-
-@bd1 = @merchant1.bulk_discounts.create!(threshold: 10, discount: 10)
-@bd2 = @merchant1.bulk_discounts.create!(threshold: 15, discount: 15)
-@bd3 = @merchant1.bulk_discounts.create!(threshold: 20, discount: 20)
-
-@bd4 = @merchant2.bulk_discounts.create!(threshold: 5, discount: 5)
-
-@bd5 = @merchant3.bulk_discounts.create!(threshold: 10, discount: 11)
-
-@bd6 = @merchant4.bulk_discounts.create!(threshold: 20, discount: 20)
-@bd7 = @merchant4.bulk_discounts.create!(threshold: 20, discount: 20)
-
-@bd8 = @merchant5.bulk_discounts.create!(threshold: 10, discount: 10)
-@bd9 = @merchant5.bulk_discounts.create!(threshold: 15, discount: 15)
-
-@bd10 = @merchant6.bulk_discounts.create!(threshold: 20, discount: 20)
-@bd11 = @merchant6.bulk_discounts.create!(threshold: 20, discount: 20)
-
-@bd12 = @merchant7.bulk_discounts.create!(threshold: 20, discount: 20)
