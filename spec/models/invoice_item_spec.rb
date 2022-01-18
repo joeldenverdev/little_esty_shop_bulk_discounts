@@ -29,8 +29,6 @@ RSpec.describe InvoiceItem, type: :model do
 
       @ii_1.update!(quantity: 11)
       expect(@ii_1.discount).to eq(10)
-      # expect(@ii_1.item.merchant.bulk_discounts.first.status).to eq("active")
-      # expect(@bd1.status).to eq("active")
     end
   end
 

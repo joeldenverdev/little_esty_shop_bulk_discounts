@@ -70,13 +70,13 @@ RSpec.describe 'merchants bulk discount index page' do
   it 'has a link to create a new bulk discount' do
     click_link "Create a New Bulk Discount"
 
-    expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts/new")
+    expect(current_path).to eq(new_merchant_bulk_discount_path(@merchant1))
 
     fill_in :discount, with: 10
     fill_in :threshold, with: 10
     click_button "Create Discount"
 
-    expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts")
+    expect(current_path).to eq(merchant_bulk_discounts_path(@merchant1))
 
     expect(page).to have_content("Threshold: 10")
     expect(page).to have_content("Discount: 10")
@@ -98,19 +98,19 @@ RSpec.describe 'merchants bulk discount index page' do
 
   it 'has a link that removes that discount from the page' do
     click_link "Delete Bulk Discount ##{@bd1.id}"
-    expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts")
+    expect(current_path).to eq(merchant_bulk_discounts_path(@merchant1))
     expect(page).to_not have_content(@bd1.id)
     expect(page).to have_content(@bd2.id)
     expect(page).to have_content(@bd3.id)
 
     click_link "Delete Bulk Discount ##{@bd2.id}"
-    expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts")
+    expect(current_path).to eq(merchant_bulk_discounts_path(@merchant1))
     expect(page).to_not have_content(@bd1.id)
     expect(page).to_not have_content(@bd2.id)
     expect(page).to have_content(@bd3.id)
 
     click_link "Delete Bulk Discount ##{@bd3.id}"
-    expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts")
+    expect(current_path).to eq(merchant_bulk_discounts_path(@merchant1))
     expect(page).to_not have_content(@bd1.id)
     expect(page).to_not have_content(@bd2.id)
     expect(page).to_not have_content(@bd3.id)
@@ -119,19 +119,19 @@ RSpec.describe 'merchants bulk discount index page' do
   # EDGE CASE
   it 'shows that no bulk discounts exist when the merchant doesnt have any' do
     click_link "Delete Bulk Discount ##{@bd1.id}"
-    expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts")
+    expect(current_path).to eq(merchant_bulk_discounts_path(@merchant1))
     expect(page).to_not have_content(@bd1.id)
     expect(page).to have_content(@bd2.id)
     expect(page).to have_content(@bd3.id)
 
     click_link "Delete Bulk Discount ##{@bd2.id}"
-    expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts")
+    expect(current_path).to eq(merchant_bulk_discounts_path(@merchant1))
     expect(page).to_not have_content(@bd1.id)
     expect(page).to_not have_content(@bd2.id)
     expect(page).to have_content(@bd3.id)
 
     click_link "Delete Bulk Discount ##{@bd3.id}"
-    expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts")
+    expect(current_path).to eq(merchant_bulk_discounts_path(@merchant1))
     expect(page).to_not have_content(@bd1.id)
     expect(page).to_not have_content(@bd2.id)
     expect(page).to_not have_content(@bd3.id)
