@@ -45,6 +45,7 @@
             <td style="text-align:center"><%= i.item.name %></td>
             <td style="text-align:center"><%= i.quantity %></td>
             <td style="text-align:center">$<%= i.unit_price %></td>
+            <td style="text-align:center"><%= link_to_if i.has_discount, "Bulk Discount ##{i.bd_id} Applied", "/merchant/#{@merchant.id}/bulk_discounts/#{i.bd_id}" %></td>
             <td style="text-align:center"><%= form_with model: @invoice, url: merchant_invoice_path(@merchant, @invoice), method: :patch, local: true do |f| %>
                                             <%= f.select :status, Invoice.statuses.keys, selected: "#{@invoice.status}" %>
                                             <%= f.submit 'Update Invoice' %>
@@ -59,6 +60,8 @@
 
 <h2>Total Revenue from Invoice #<%= @invoice.id %></h2>
 Total Revenue: $<%= @invoice.total_revenue %><br>
-Discount Percentage: <%= @invoice.percent_discount %>%
-Total Discount: $<%= @invoice.total_discount.round(2) %>
-Total After Discount: $<%= @invoice.total_after_discount %>
+<% @invoice.percent_discount.each do |discount| %>
+  Discount Applied: <%= discount %>%<br>
+<% end %>
+Total Discount: $<%= @invoice.total_discount %><br>
+Total After Discount: $<%= @invoice.total_after_discount %><br>

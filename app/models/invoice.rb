@@ -19,7 +19,8 @@ class Invoice < ApplicationRecord
   end
 
   def total_discount
-    invoice_items.sum("(unit_price * quantity) - (discounted_price * quantity)")
+    total = invoice_items.sum("(unit_price * quantity) - (discounted_price * quantity)")
+    total.round(2)
   end
 
   def total_revenue

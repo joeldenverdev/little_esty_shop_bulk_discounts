@@ -11,17 +11,19 @@ class InvoiceItem < ApplicationRecord
 
   enum status: [:pending, :packaged, :shipped]
 
-  after_update :discount_checker
-  after_create :default_price_calculator
-  after_create :discount_checker
+  after_update :discount_validator
+  after_create :discount_price_calculator
+  after_create :discount_validator
 
-  def default_price_calculator
-    self.update!(discounted_price: unit_price - (eligible_discount * (unit_price / 100.00)))
+  def discount_price_calculator
+    self.update!(discounted_price: calculate_discounted_price)
+    # self.update!(discounted_price: (unit_price - (unit_price * (eligible_discount / 100.00))))
   end
 
-  def discount_checker
-    if check_for_discount_eligibility > 0 && discount_needs_update
-      self.update!(discount: eligible_discount, discounted_price: (unit_price - (unit_price * (eligible_discount / 100.00))))
+  def discount_validator
+    if eligible_for_discount && discount_needs_update
+      self.update!(discount: eligible_discount, discounted_price: calculate_discounted_price)
+      # self.update!(discount: eligible_discount, discounted_price: (unit_price - (unit_price * (eligible_discount / 100.00))))
     end
   end
 
@@ -29,8 +31,8 @@ class InvoiceItem < ApplicationRecord
     eligible_discount != discount
   end
 
-  def check_for_discount_eligibility
-    item.bulk_discounts.where('bulk_discounts.threshold <= ?', quantity).count
+  def eligible_for_discount
+    item.bulk_discounts.where('bulk_discounts.threshold <= ?', quantity).count > 0
   end
 
   def eligible_discount
@@ -40,6 +42,19 @@ class InvoiceItem < ApplicationRecord
         .order(discount: :desc)
         .pluck(:discount)
         .first || 0
+  end
+
+  def has_discount
+    discount > 0
+  end
+
+  def bd_id
+    item.bulk_discounts
+        .where('bulk_discounts.discount = ?', discount)
+        .select('bulk_discounts.id')
+        .group("bulk_discounts.id")
+        .pluck(:id)
+        .first
   end
 
   def self.incomplete_invoices
