@@ -11,7 +11,7 @@ RSpec.describe 'Merchants Bulk Discount Show Page' do
 
   context 'when I visit a merchants bulk discount index page' do
     it 'shows the bulk discounts discount and threshold' do
-      visit "/merchant/#{@merchant1.id}/bulk_discounts/#{@bd1.id}"
+      visit merchant_bulk_discount_path(@merchant1, @bd1)
       expect(page).to have_content("Discount: #{@bd1.discount}%")
       expect(page).to have_content("Threshold: #{@bd1.threshold} Items")
     end

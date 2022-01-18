@@ -56,9 +56,9 @@
 </body>
 
 <h2>Total Revenue from Invoice #<%= @invoice.id %></h2>
-Total Revenue: $<%= @invoice.total_revenue %><br>
+Total Revenue: $<%= number_with_precision @invoice.total_revenue, :precision => 2 %><br>
 <% @invoice.percent_discount.each do |discount| %>
   Discount Applied: <%= discount %>%<br>
 <% end %>
-Total Discount: $<%= @invoice.total_discount %><br>
-Total After Discount: $<%= @invoice.total_after_discount %><br>
+Total Discount: $<%= number_with_precision @invoice.total_discount, :precision => 2 %><br>
+Total After Discount: $<%= number_with_precision @invoice.total_after_discount, :precision => 2 %><br>

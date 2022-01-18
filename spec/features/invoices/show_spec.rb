@@ -55,28 +55,22 @@ RSpec.describe 'invoices show' do
     @transaction6 = Transaction.create!(credit_card_number: 879799, result: 0, invoice_id: @invoice_6.id)
     @transaction7 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_7.id)
     @transaction8 = Transaction.create!(credit_card_number: 203942, result: 1, invoice_id: @invoice_8.id)
-
+    visit merchant_invoice_path(@merchant1, @invoice_1)
   end
 
   it "shows the invoice information" do
-    visit merchant_invoice_path(@merchant1, @invoice_1)
-
     expect(page).to have_content(@invoice_1.id)
     expect(page).to have_content(@invoice_1.status)
     expect(page).to have_content(@invoice_1.created_at.strftime("%A, %B %-d, %Y"))
   end
 
   it "shows the customer information" do
-    visit merchant_invoice_path(@merchant1, @invoice_1)
-
     expect(page).to have_content(@customer_1.first_name)
     expect(page).to have_content(@customer_1.last_name)
     expect(page).to_not have_content(@customer_2.last_name)
   end
 
   it "shows the item information" do
-    visit merchant_invoice_path(@merchant1, @invoice_1)
-
     expect(page).to have_content(@item_1.name)
     expect(page).to have_content(@ii_1.quantity)
     expect(page).to have_content(@ii_1.unit_price)
@@ -85,14 +79,10 @@ RSpec.describe 'invoices show' do
   end
 
   it "shows the total revenue for this invoice" do
-    visit merchant_invoice_path(@merchant1, @invoice_1)
-
     expect(page).to have_content(@invoice_1.total_revenue)
   end
 
   it "shows a select field to update the invoice status" do
-    visit merchant_invoice_path(@merchant1, @invoice_1)
-
     within("#the-status-#{@ii_1.id}") do
       page.select("cancelled")
       click_button "Update Invoice"
@@ -106,30 +96,24 @@ RSpec.describe 'invoices show' do
   end
 
   it 'shows the total revenue of the merchant from this invoice' do
-    visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
     expect(page).to have_content("Total Revenue from Invoice ##{@invoice_1.id}")
   end
 
   it 'it displays the revenue for the merchant from this invoice, NOT including discounts' do
-    visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
     expect(page).to have_content("Total Revenue: $172.0")
   end
 
   it 'it displays the total discounted revenue for the merchant which has the bulk discounts in the calculation' do
-    visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
-    expect(page).to have_content("Total Discount: $17.2")
   end
 
   it 'has a link next to each invoice item to the show page for that bulk discount, if there was one' do
-    visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
     expect(page).to have_link("Bulk Discount ##{@bd1.id} Applied")
   end
 
   it 'has a link which takes you to the applied bulk discounts show page' do
-    visit "/merchant/#{@merchant1.id}/invoices/#{@invoice_1.id}"
     within "#the-status-#{@ii_1.id}" do
       click_link "Bulk Discount ##{@bd1.id} Applied"
-      expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts/#{@bd1.id}")
+      expect(current_path).to eq(merchant_bulk_discount_path(@merchant1, @bd1))
     end
   end
 end

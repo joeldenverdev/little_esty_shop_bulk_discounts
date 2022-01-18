@@ -12,16 +12,16 @@ RSpec.describe 'Bulk Discounts Edit Page and Form' do
   context 'when I visit the bulk discounts show page' do
     describe 'and I click on the button to edit the discount information' do
       it 'has a link to edit that bulk discounts information' do
-        visit "/merchant/#{@merchant1.id}/bulk_discounts/#{@bd1.id}"
+        visit  merchant_bulk_discount_path(@merchant1, @bd1)
         click_link "Edit Discount ##{@bd1.id}"
 
-        expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts/#{@bd1.id}/edit")
+        expect(current_path).to eq(edit_merchant_bulk_discount_path(@merchant1, @bd1))
 
         fill_in :discount, with: 13
         fill_in :threshold, with: 13
         click_button "Submit"
 
-        expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts/#{@bd1.id}")
+        expect(current_path).to eq(merchant_bulk_discount_path(@merchant1, @bd1))
 
         expect(page).to have_content("Discount: 13%")
         expect(page).to have_content("Threshold: 13 Items")
@@ -31,11 +31,11 @@ RSpec.describe 'Bulk Discounts Edit Page and Form' do
       end
 
       it 'has fields which are pre-filled with the existing discount info' do
-        visit "/merchant/#{@merchant1.id}/bulk_discounts/#{@bd1.id}"
+        visit merchant_bulk_discount_path(@merchant1, @bd1)
 
         click_link "Edit Discount ##{@bd1.id}"
 
-        expect(current_path).to eq("/merchant/#{@merchant1.id}/bulk_discounts/#{@bd1.id}/edit")
+        expect(current_path).to eq(edit_merchant_bulk_discount_path(@merchant1, @bd1))
 
         expect(find_field('Discount').value).to eq("10")
         expect(find_field('Threshold').value).to eq("10")
@@ -43,7 +43,7 @@ RSpec.describe 'Bulk Discounts Edit Page and Form' do
 
       # EDGE CASE / Extra Testing Scenarios
       it 'will always be up to date after repeated updates' do
-        visit "/merchant/#{@merchant1.id}/bulk_discounts/#{@bd1.id}"
+        visit merchant_bulk_discount_path(@merchant1, @bd1)
 
         click_link "Edit Discount ##{@bd1.id}"
 
@@ -75,7 +75,7 @@ RSpec.describe 'Bulk Discounts Edit Page and Form' do
       end
       # EDGE CASE
       it 'allows the user to only change one attribute' do
-        visit "/merchant/#{@merchant1.id}/bulk_discounts/#{@bd1.id}"
+        visit merchant_bulk_discount_path(@merchant1, @bd1)
 
         click_link "Edit Discount ##{@bd1.id}"
 
@@ -93,32 +93,19 @@ RSpec.describe 'Bulk Discounts Edit Page and Form' do
       context 'Edge Cases in which the user could break the form' do
         # EDGE CASE
         it 'will return an error message if the user tries to save the form with an empty field' do
+          visit merchant_bulk_discount_path(@merchant1, @bd1)
 
-        end
+          click_link "Edit Discount ##{@bd1.id}"
 
-        # EDGE CASE
-        it 'will return an error message if the user tries to save data that is not an integer' do
+          expect(find_field('Discount').value).to eq("10")
+          expect(find_field('Threshold').value).to eq("10")
 
-        end
+          # Only choosing to update one field
+          fill_in :threshold, with: ""
+          fill_in :discount, with: ""
+          click_button "Submit"
 
-        # EDGE CASE
-        it 'will return an error message if the user tries to save a percentage higher than 100%' do
-
-        end
-
-        # EDGE CASE
-        it 'will return an error message if the user tries to save anything besides a whole number' do
-
-        end
-
-        # EDGE CASE
-        it 'will return an error message if the user tries to save a negative number for discount' do
-
-        end
-
-        # EDGE CASE
-        it 'will return an error message if the user tries to save a negative number for threshold' do
-
+          expect(page).to have_content("The form must be completed!!")
         end
       end
     end
