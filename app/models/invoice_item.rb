@@ -17,13 +17,11 @@ class InvoiceItem < ApplicationRecord
 
   def discount_price_calculator
     self.update!(discounted_price: calculate_discounted_price)
-    # self.update!(discounted_price: (unit_price - (unit_price * (eligible_discount / 100.00))))
   end
 
   def discount_validator
     if eligible_for_discount && discount_needs_update
       self.update!(discount: eligible_discount, discounted_price: calculate_discounted_price)
-      # self.update!(discount: eligible_discount, discounted_price: (unit_price - (unit_price * (eligible_discount / 100.00))))
     end
   end
 
