@@ -54,3 +54,11 @@
   </table>
 
 </body>
+
+<h2>Total Revenue from Invoice #<%= @invoice.id %></h2>
+Total Revenue: $<%= @invoice.total_revenue %><br>
+<% @invoice.percent_discount.each do |discount| %>
+  Discount Applied: <%= discount %>%<br>
+<% end %>
+Total Discount: $<%= @invoice.total_discount %><br>
+Total After Discount: $<%= @invoice.total_after_discount %><br>
